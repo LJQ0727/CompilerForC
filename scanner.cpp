@@ -141,7 +141,7 @@ public:
     void create_DFA(NFA* nfa);
 
     // driver that matches the code to the DFA
-    void match_code(istream* code_istream, ostream* token_ostream);
+    void match_code(istream* code_istream, ostream* token_ostream, ostream* semantic_ostream);
 
 };
 
@@ -594,16 +594,18 @@ void DFA::create_DFA(NFA* nfa) {
 }
 
 // the driver function to match the code to the DFA given the code stream
-void DFA::match_code(istream* code_istream, ostream* token_ostream)
+void DFA::match_code(istream* code_istream, ostream* token_ostream, ostream* semantic_ostream)
 {
     // match the code to the DFA
     int current_state = start_state;
+    string semantic_value;  // the content of the token
     while (true) {
         char ch = code_istream->get();
         if (code_istream->eof()) {
             // when seeing EOF, check if the current state is a final state
             if (current_state != start_state && dfa_states[current_state].final_state_token != NUL_TOKEN) {
                 *token_ostream << dfa_states[current_state].final_state_token << endl;
+                *semantic_ostream << semantic_value << endl;
             }
             break;
         }
@@ -612,7 +614,9 @@ void DFA::match_code(istream* code_istream, ostream* token_ostream)
         if (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\0' || ch == '\t') {
             if (current_state != start_state && dfa_states[current_state].final_state_token != NUL_TOKEN) {
                 *token_ostream << dfa_states[current_state].final_state_token << endl;
+                *semantic_ostream << semantic_value << endl;
                 current_state = start_state;
+                semantic_value = "";
                 continue;
             } else {
                 continue;
@@ -624,17 +628,20 @@ void DFA::match_code(istream* code_istream, ostream* token_ostream)
         // if the next character is not a valid transition, then check if the current state is a final state
         if (next_state != -1) {
             current_state = next_state;
+            semantic_value += ch;
         }
         else {
             *token_ostream << dfa_states[current_state].final_state_token << endl;
+            *semantic_ostream << semantic_value << endl;
             current_state = start_state;
+            semantic_value = "";
             code_istream->unget();
         }
     }
 }
 
 // wraps the whole scanner, output token to an ostream
-void scanner_driver(string input_fname, std::ostream* token_ostream, std::vector<std::string>* idx_to_token_copy)
+void scanner_driver(string input_fname, std::ostream* token_ostream, std::vector<std::string>* idx_to_token_copy, std::ostream* semantic_ostream)
 {
     std::ifstream code_ifstream(input_fname);
 
@@ -697,6 +704,6 @@ void scanner_driver(string input_fname, std::ostream* token_ostream, std::vector
     dfa.create_DFA(&nfa);
 
     // match code to the DFA
-    dfa.match_code(&code_ifstream, token_ostream);
+    dfa.match_code(&code_ifstream, token_ostream, semantic_ostream);
     code_ifstream.close();
 }
