@@ -28,6 +28,7 @@ class LROneParser;
 class TokenStream {
 public:
     vector<parser_token> tokens;
+    vector<string> semantic_values;
     int idx = 0;
     void unget() {
         if (idx > 0) {
@@ -41,8 +42,18 @@ public:
             return SCANEOF;
         }
     }
+    string get_semantic_value() {
+        if (idx < semantic_values.size()) {
+            return semantic_values[idx++];
+        } else {
+            return "";
+        }
+    }
     void push_back(parser_token tok) {
         tokens.push_back(tok);
+    }
+    void push_semantic_value(string val) {
+        semantic_values.push_back(val);
     }
 };
 
@@ -581,7 +592,8 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "Missing input file!\n");
     }
     stringstream ss;
-    scanner_driver(string(argv[1]), &ss, &idx_to_token_copy);
+    stringstream semantic_stream;
+    scanner_driver(string(argv[1]), &ss, &idx_to_token_copy, &semantic_stream);
 
     TokenStream tokens;    // store the scanned tokens, used by parser
 
@@ -610,17 +622,22 @@ int main(int argc, char const *argv[])
     cout << "Scanned Tokens: " << endl;
     while (true)
     {
-        int a;
-        ss >> a;
+        int tok;
+        string semantic_value;
+        ss >> tok;
+        semantic_stream >> semantic_value;
         if (ss.eof())
         {
             tokens.push_back(SCANEOF);
-            cout << "SCANEOF\n\n";
+            tokens.push_semantic_value("SCANEOF");
+            // cout << "SCANEOF\n\n";
             break;
         }
         
-        cout << idx_to_token_copy[a] << " ";
-        tokens.push_back((parser_token)a);
+        // cout << idx_to_token_copy[tok] << " ";
+        cout << semantic_value << " ";
+        tokens.push_back((parser_token)tok);
+        tokens.push_semantic_value(semantic_value);
     }
 
     LROneParser parser;
