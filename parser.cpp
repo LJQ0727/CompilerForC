@@ -42,9 +42,11 @@ public:
             return SCANEOF;
         }
     }
+    // should first call get() before getting semantic value
+    // no need to unget semantic value
     string get_semantic_value() {
         if (idx < semantic_values.size()) {
-            return semantic_values[idx++];
+            return semantic_values[idx];
         } else {
             return "";
         }
@@ -175,8 +177,10 @@ void LROneParser::parse(TokenStream* input_stream) {
     curr_state = 0;
     stack<int> state_stack;
     stack<parser_token> operator_stack;
+    stack<string> semantic_stack;
     state_stack.push(0);
     parser_token next_token;
+    string next_semantic_value;
     vector<parser_token> token_stack;
 
     // encode operator precedence, using the value from cppreference.com
@@ -209,8 +213,9 @@ void LROneParser::parse(TokenStream* input_stream) {
 
     while (true) {
         next_token = input_stream->get();
+        next_semantic_value = input_stream->get_semantic_value();
 
-        cout << "state: " << curr_state << "\t" << "next type: " << idx_to_token_copy[next_token] << "\t\t";
+        // cout << "state: " << curr_state << "\t" << "next type: " << idx_to_token_copy[next_token] << "\t\t";
 
         bool can_shift = false;
         // check if can shift
@@ -246,7 +251,7 @@ void LROneParser::parse(TokenStream* input_stream) {
         if (can_reduce) {
             for (auto rule : parser_states[curr_state]->all_prod_rules) {
                 if (rule.is_end() && rule.lookaheads.count(next_token)) {
-                    // reduce
+                    // perform reduce
                     reduced_token = rule.lhs;
                     cout << "reduce by grammar " << rule.index+1 << ": " << idx_to_token_copy[rule.lhs] << "->";
                     if (rule.rhs.size() == 0) {
@@ -261,7 +266,7 @@ void LROneParser::parse(TokenStream* input_stream) {
                         }
                         cout << endl;
                         token_stack.push_back(reduced_token);
-                        print_token_stack(token_stack, token_stack.size()-1);
+                        // print_token_stack(token_stack, token_stack.size()-1);
                         token_stack.pop_back();
                     }
                     for (int i = 0; i < rule.rhs.size(); i++) {
@@ -279,18 +284,20 @@ void LROneParser::parse(TokenStream* input_stream) {
             }
         }
 
-        // check if can be shifted
+        // perform shift
         if (parser_states[curr_state]->goto_table[next_token] != -1) {
             // add shifted operator to stack
             if (is_operator(next_token)) {
                 operator_stack.push(next_token);
             }
+            // add shifted semantic value to stack
+            semantic_stack.push(next_semantic_value);
             // shift
-            cout << "shift to state " << parser_states[curr_state]->goto_table[next_token] << endl;
+            // cout << "shift to state " << parser_states[curr_state]->goto_table[next_token] << endl;
             state_stack.push(parser_states[curr_state]->goto_table[next_token]);
             curr_state = state_stack.top();
             token_stack.push_back(next_token);
-            print_token_stack(token_stack, token_stack.size());
+            // print_token_stack(token_stack, token_stack.size());
             // accept when the whole code is reduced to program
             if (next_token == SCANEOF) {
                 cout << "Accept!" << endl;
@@ -619,7 +626,7 @@ int main(int argc, char const *argv[])
     }
 
     // print out the scanned tokens
-    cout << "Scanned Tokens: " << endl;
+    // cout << "Scanned Tokens: " << endl;
     while (true)
     {
         int tok;
@@ -635,7 +642,7 @@ int main(int argc, char const *argv[])
         }
         
         // cout << idx_to_token_copy[tok] << " ";
-        cout << semantic_value << " ";
+        // cout << semantic_value << " ";
         tokens.push_back((parser_token)tok);
         tokens.push_semantic_value(semantic_value);
     }
@@ -727,7 +734,7 @@ int main(int argc, char const *argv[])
 
 
     parser.construct_parser(system_goal, vector<parser_token>{program, SCANEOF});
-    cout << "Parsing Process: \n";
+    // cout << "Parsing Process: \n";
     parser.parse(&tokens);
 
     return 0;
