@@ -61,7 +61,7 @@ enum parser_token {
     system_goal,
 };
 
-bool is_terminal_token(parser_token tok) {
+inline bool is_terminal_token(parser_token tok) {
     return tok <= ID || tok == SCANEOF || tok == LAMBDA;
 }
 
@@ -87,4 +87,6 @@ public:
         assert(!is_end());
         return rhs[dot_location];
     }
+
+    std::string descriptor;
 };
