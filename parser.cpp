@@ -4,18 +4,9 @@
     using LR(1) parsing method and supports context-free grammars
 */
 
-#include <stack>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <set>
-#include <cassert>
-#include <map>
-#include <algorithm>
-
 #include "scanner.h"
 #include "parser.h"
+#include "semantic_routines.h"
 
 using namespace std;
 
@@ -59,29 +50,7 @@ public:
     }
 };
 
-// a production rule with a 'dot',
-// representing the parsing status
-class ProductionRule {
-public:
-    parser_token lhs;  // left-hand side token
-    vector<parser_token> rhs;  // right-hand side tokens; in their order
 
-    int dot_location;   // the dot is placed before the index
-    set<parser_token> lookaheads;    // the look-ahead part in LR(1)
-
-    ProductionRule advance_dot();
-
-    int index;
-
-    bool is_end() {
-        return dot_location >= rhs.size();
-    }
-
-    parser_token get_next_token() {
-        assert(!is_end());
-        return rhs[dot_location];
-    }
-};
 
 // a state in the LR(1) parser
 class ItemSet {
@@ -254,8 +223,11 @@ void LROneParser::parse(TokenStream* input_stream) {
                     // perform reduce
                     reduced_token = rule.lhs;
                     cout << "reduce by grammar " << rule.index+1 << ": " << idx_to_token_copy[rule.lhs] << "->";
+                    
+                    codegen(rule, &semantic_stack);
+                    
                     if (rule.rhs.size() == 0) {
-                        cout << "lambda" << endl;
+                        // cout << "lambda" << endl;
                     } else {
                         for (auto tok : rule.rhs) {
                             cout << idx_to_token_copy[tok] << " ";

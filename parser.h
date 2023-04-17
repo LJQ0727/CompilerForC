@@ -1,3 +1,15 @@
+#pragma once
+
+#include <stack>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <set>
+#include <cassert>
+#include <map>
+#include <algorithm>
+
 // declaration of scanner tokens
 // the non-terminals must follow the same defined in "scanner.cpp"
 enum parser_token {
@@ -52,3 +64,27 @@ enum parser_token {
 bool is_terminal_token(parser_token tok) {
     return tok <= ID || tok == SCANEOF || tok == LAMBDA;
 }
+
+// a production rule with a 'dot',
+// representing the parsing status
+class ProductionRule {
+public:
+    parser_token lhs;  // left-hand side token
+    std::vector<parser_token> rhs;  // right-hand side tokens; in their order
+
+    int dot_location;   // the dot is placed before the index
+    std::set<parser_token> lookaheads;    // the look-ahead part in LR(1)
+
+    ProductionRule advance_dot();
+
+    int index;
+
+    bool is_end() {
+        return dot_location >= rhs.size();
+    }
+
+    parser_token get_next_token() {
+        assert(!is_end());
+        return rhs[dot_location];
+    }
+};
