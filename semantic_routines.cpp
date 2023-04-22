@@ -100,10 +100,35 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
 
     // for every expression type, we need to store the result in a memory location
     else if (rule.descriptor == "id_idx") {
+        new_semantic = semantic_values[2];
         // index the array
         new_semantic.type = expression;
-        string key = semantic_values[0].raw_value + "[" + semantic_values[2].raw_value + "]";
-        new_semantic.mem_location = symbol_table[key];
+        // load the exp value into $t0
+        switch (semantic_values[2].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+        // subtract the base address by the offset*4
+        new_semantic.push_back_instruction("sll $t0, $t0, 2");  // $t0 will hold the offset
+        // $t3 will hold the base address
+        new_semantic.push_back_instruction("addi $t3, $sp, " + to_string(symbol_table[semantic_values[0].raw_value + "[0]"]));
+        new_semantic.push_back_instruction("sub $t0, $t3, $t0");
+        // $t0 now holds the memory offset
+        new_semantic.push_back_instruction("sw $t1, 0($t0)");
+        // $t1 now holds the value of the array element
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t1, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "not_exp") {
         new_semantic = semantic_values[1];
@@ -478,7 +503,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
             break;
         case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[5].variable_name]) + "($sp)");
             break;
         default:
             break;
@@ -487,10 +512,10 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         switch (semantic_values[2].type)
         {
         case literal:
-            new_semantic.push_back_instruction("addi $t1, $zero, " + to_string(new_semantic.value));
+            new_semantic.push_back_instruction("addi $t1, $zero, " + to_string(semantic_values[2].value));
             break;
         case expression:
-            new_semantic.push_back_instruction("lw $t1, " + to_string(new_semantic.mem_location) + "($sp)");
+            new_semantic.push_back_instruction("lw $t1, " + to_string(semantic_values[2].mem_location) + "($sp)");
             break;
         case id:
             new_semantic.push_back_instruction("lw $t1, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
@@ -501,10 +526,9 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         // subtract the base address by the offset*4
         new_semantic.push_back_instruction("sll $t1, $t1, 2");
         // $t3 will hold the base address
-        new_semantic.push_back_instruction("sw $t3, " + to_string(symbol_table[semantic_values[0].raw_value + "[0]"]) + "($sp)");
+        new_semantic.push_back_instruction("addi $t3, $sp, " + to_string(symbol_table[semantic_values[0].raw_value + "[0]"]));
         new_semantic.push_back_instruction("sub $t1, $t3, $t1");
         // store the value in $t0 to the address in $t1
-        new_semantic.push_back_instruction("add $t1, $sp, $t1");
         new_semantic.push_back_instruction("sw $t0, 0($t1)");
     }
     else if (rule.descriptor == "if") {
