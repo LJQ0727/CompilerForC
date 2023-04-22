@@ -250,7 +250,7 @@ void LROneParser::parse(TokenStream* input_stream) {
 
                     input_stream->unget();
                     next_token = reduced_token;
-                    cout << "state: " << curr_state << "\t" << "next type: " << idx_to_token_copy[next_token] << "\t\t";
+                    // cout << "state: " << curr_state << "\t" << "next type: " << idx_to_token_copy[next_token] << "\t\t";
                     break;
                 }
             }
@@ -272,7 +272,7 @@ void LROneParser::parse(TokenStream* input_stream) {
             // print_token_stack(token_stack, token_stack.size());
             // accept when the whole code is reduced to program
             if (next_token == SCANEOF) {
-                cout << "Accept!" << endl;
+                // cout << "Accept!" << endl;
                 return;
             }
         } else {
@@ -636,7 +636,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(declaration, vector<parser_token>{ID, LSQUARE, INT_NUM, RSQUARE}, "id_decl_array");
 
     parser.register_prod_rule(code_block, vector<parser_token>{statement});
-    parser.register_prod_rule(code_block, vector<parser_token>{LBRACE, statements, RBRACE});
+    parser.register_prod_rule(code_block, vector<parser_token>{SCOPE_BEGIN, statements, SCOPE_END});
 
     parser.register_prod_rule(statements, vector<parser_token>{statement});
     parser.register_prod_rule(statements, vector<parser_token>{statements, statement});
@@ -660,15 +660,15 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt});
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt, ELSE, code_block});
 
-    parser.register_prod_rule(SCOPE_BEGIN, vector<parser_token>{LPAR}, "scope_begin");
-    parser.register_prod_rule(SCOPE_END, vector<parser_token>{RPAR}, "scope_end");
+    parser.register_prod_rule(SCOPE_BEGIN, vector<parser_token>{LBRACE}, "scope_begin");
+    parser.register_prod_rule(SCOPE_END, vector<parser_token>{RBRACE}, "scope_end");
 
-    parser.register_prod_rule(if_stmt, vector<parser_token>{IF, SCOPE_BEGIN, exp, SCOPE_END, code_block});
-    parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, SCOPE_BEGIN, exp, SCOPE_END, code_block});
-    parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, SCOPE_BEGIN, exp, SCOPE_END});
+    parser.register_prod_rule(if_stmt, vector<parser_token>{IF, LPAR, exp, RPAR, code_block});
+    parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, LPAR, exp, RPAR, code_block});
+    parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, LPAR, exp, RPAR});
     parser.register_prod_rule(return_statement, vector<parser_token>{RETURN});
-    parser.register_prod_rule(read_statement, vector<parser_token>{READ, SCOPE_BEGIN, ID, SCOPE_END});
-    parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, SCOPE_BEGIN, exp, SCOPE_END});
+    parser.register_prod_rule(read_statement, vector<parser_token>{READ, LPAR, ID, RPAR}, "read");
+    parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, LPAR, exp, RPAR}, "write");
 
 
     parser.register_prod_rule(exp, vector<parser_token>{INT_NUM}, "exp_int");
@@ -692,7 +692,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(exp, vector<parser_token>{exp, LTEQ, exp}, "lteq");
     parser.register_prod_rule(exp, vector<parser_token>{exp, GTEQ, exp}, "gteq");
 
-    parser.register_prod_rule(exp, vector<parser_token>{SCOPE_BEGIN, exp, SCOPE_END}, "parexp");
+    parser.register_prod_rule(exp, vector<parser_token>{LPAR, exp, RPAR}, "parexp");
 
     parser.register_prod_rule(exp, vector<parser_token>{MINUS, exp}, "minusexp");
     parser.register_prod_rule(exp, vector<parser_token>{PLUS, exp}, "plusexp");
