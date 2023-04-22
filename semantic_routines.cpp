@@ -386,7 +386,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("syscall");
         // store the result in $v0 in the variable
         new_semantic.type = stmt;
-        new_semantic.push_back_instruction("sw $v0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+        new_semantic.push_back_instruction("sw $v0, " + to_string(symbol_table[semantic_values[2].raw_value]) + "($sp)");
     }
     else if (rule.descriptor == "return") {
         new_semantic.type = stmt;
@@ -437,15 +437,15 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         {
         case literal:
             new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].variable_name]) + "($sp)");
+            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
             break;
         case expression:
             new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].variable_name]) + "($sp)");
+            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
             break;
         case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].variable_name]) + "($sp)");
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].raw_value]) + "($sp)");
+            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
             break;
         default:
             break;
@@ -488,7 +488,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         // subtract the base address by the offset*4
         new_semantic.push_back_instruction("sll $t1, $t1, 2");
         // $t3 will hold the base address
-        new_semantic.push_back_instruction("sw $t3, " + to_string(symbol_table[semantic_values[0].variable_name + "[0]"]) + "($sp)");
+        new_semantic.push_back_instruction("sw $t3, " + to_string(symbol_table[semantic_values[0].raw_value + "[0]"]) + "($sp)");
         new_semantic.push_back_instruction("sub $t1, $t3, $t1");
         // store the value in $t0 to the address in $t1
         new_semantic.push_back_instruction("add $t1, $sp, $t1");
