@@ -657,13 +657,13 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(assign_statement, vector<parser_token>{ID, LSQUARE, exp, RSQUARE, ASSIGN, exp}, "assign1");
     parser.register_prod_rule(assign_statement, vector<parser_token>{ID, ASSIGN, exp}, "assign2");
 
-    parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt});
-    parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt, ELSE, code_block});
+    parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt}); // auto-copy
+    parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt, ELSE, code_block}, "if_else");
 
     parser.register_prod_rule(SCOPE_BEGIN, vector<parser_token>{LBRACE}, "scope_begin");
     parser.register_prod_rule(SCOPE_END, vector<parser_token>{RBRACE}, "scope_end");
 
-    parser.register_prod_rule(if_stmt, vector<parser_token>{IF, LPAR, exp, RPAR, code_block});
+    parser.register_prod_rule(if_stmt, vector<parser_token>{IF, LPAR, exp, RPAR, code_block}, "if");
     parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, LPAR, exp, RPAR, code_block});
     parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, LPAR, exp, RPAR});
     parser.register_prod_rule(return_statement, vector<parser_token>{RETURN}, "return");
