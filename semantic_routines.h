@@ -16,7 +16,12 @@ enum semantic_type {
     expression,
 
     terminal,   // the raw info directly from scanner
+
+    stmt,
 };
+
+extern int next_mem_location;
+
 class SymbolTable {
 public:
     SymbolTable() {
@@ -30,7 +35,9 @@ public:
                 return tables[i][key];
             }
         }
-        return 0;
+        add_symbol(key, next_mem_location);
+        next_mem_location -= 4;
+        return operator[](key);
     }
     void add_scope() {
         tables.push_back(std::map<std::string, int>());
@@ -73,6 +80,17 @@ public:
 
     // return the label number
     int push_back_label();
+
+    void printout() {
+        for (std::string instruction : instructions) {
+            std::cout << instruction << std::endl;
+        }
+        instructions.clear();
+    }
+
+    void merge_with(Semantic other) {
+        instructions.insert(instructions.end(), other.instructions.begin(), other.instructions.end());
+    }
 
     // std::vector<std::string> evaluate_expression();  // evaluation result saved in $t0
 };

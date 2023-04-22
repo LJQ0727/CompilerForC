@@ -72,7 +72,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.variable_name = semantic_values[0].raw_value;
     }
 
-    // dealing with expressions
+    // derive expressions
     else if (rule.descriptor == "exp_int") {
         new_semantic.type = literal;
         new_semantic.value = stoi(semantic_values[0].raw_value);
@@ -126,6 +126,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
 
     // binary operators
     else if (rule.descriptor == "plus") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -135,6 +137,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "minus") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -144,6 +148,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "mul") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -153,6 +159,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "div") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -163,6 +171,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "shl") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -172,6 +182,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "shr") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -181,6 +193,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "and") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -190,6 +204,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "or") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -199,6 +215,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "andand") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -222,6 +240,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
 
     }
     else if (rule.descriptor == "oror") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -234,6 +254,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "eq") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -244,6 +266,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "noteq") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -256,6 +280,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "lt") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -265,6 +291,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "gt") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -274,6 +302,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "lteq") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -284,6 +314,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
     else if (rule.descriptor == "gteq") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
         new_semantic.type = expression;
         get_semantic_value(semantic_values[0], 1, &new_semantic);
         get_semantic_value(semantic_values[2], 2, &new_semantic);
@@ -325,11 +357,46 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     else if (rule.descriptor == "scope_end") {
         symbol_table.close_scope();
     }
+    else if (rule.descriptor == "write") {
+        // load the value into $a0
+        new_semantic = semantic_values[2];
+        new_semantic.type = stmt;
+        new_semantic.push_back_instruction("add $a0, $zero, $t0");
+        // load 1 in $v0 and print the integer
+        new_semantic.push_back_instruction("addi $v0, $zero, 1");
+        new_semantic.push_back_instruction("syscall");
+        // print newline character
+        new_semantic.push_back_instruction("addi $v0, $zero, 11");
+        new_semantic.push_back_instruction("addi $a0, $zero, 10");
+        new_semantic.push_back_instruction("syscall");
+    }
+    else if (rule.descriptor == "read") {
+        // load 5 in $v0
+        new_semantic.push_back_instruction("addi $v0, $zero, 5");
+        new_semantic.push_back_instruction("syscall");
+        // store the result in $v0 in the variable
+        new_semantic.type = stmt;
+        new_semantic.push_back_instruction("sw $v0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+    }
+    else if (rule.descriptor == "return") {
+        new_semantic.type = stmt;
+        new_semantic.push_back_instruction("b end");
+    }
+    else if (rule.descriptor == "program1" || rule.descriptor == "program2") {
+        new_semantic.type = stmt;
+        // insert main label at the front
+        new_semantic.instructions.insert(new_semantic.instructions.begin(), "main:");
+        new_semantic.instructions.push_back("end:");
+        new_semantic.push_back_instruction("addi $v0, $zero, 1");   // a placeholder instruction
+        // print out all instructions
+        for (auto instruction : new_semantic.instructions) {
+            cout << instruction << endl;
+        }
+    }
 
 
     
 
     
-
     semantic_stack->push(new_semantic);
 }

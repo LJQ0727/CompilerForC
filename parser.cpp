@@ -622,8 +622,8 @@ int main(int argc, char const *argv[])
     }
 
     LROneParser parser;
-    parser.register_prod_rule(program, vector<parser_token>{var_declarations, statements});
-    parser.register_prod_rule(program, vector<parser_token>{statements});
+    parser.register_prod_rule(program, vector<parser_token>{var_declarations, statements}, "program1");
+    parser.register_prod_rule(program, vector<parser_token>{statements}, "program2");
     
     parser.register_prod_rule(var_declarations, vector<parser_token>{var_declaration});
     parser.register_prod_rule(var_declarations, vector<parser_token>{var_declarations, var_declaration});
@@ -666,7 +666,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(if_stmt, vector<parser_token>{IF, LPAR, exp, RPAR, code_block});
     parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, LPAR, exp, RPAR, code_block});
     parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, LPAR, exp, RPAR});
-    parser.register_prod_rule(return_statement, vector<parser_token>{RETURN});
+    parser.register_prod_rule(return_statement, vector<parser_token>{RETURN}, "return");
     parser.register_prod_rule(read_statement, vector<parser_token>{READ, LPAR, ID, RPAR}, "read");
     parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, LPAR, exp, RPAR}, "write");
 
