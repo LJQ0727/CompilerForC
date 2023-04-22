@@ -681,7 +681,7 @@ int main(int argc, char const *argv[])
 
     parser.register_prod_rule(exp, vector<parser_token>{INT_NUM}, "exp_int");
     parser.register_prod_rule(exp, vector<parser_token>{ID}, "exp_id");
-    parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE});
+    parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE}, "id_init");
     parser.register_prod_rule(exp, vector<parser_token>{NOT_OP, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, PLUS, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, MINUS, exp});
@@ -700,10 +700,10 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(exp, vector<parser_token>{exp, LTEQ, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, GTEQ, exp});
 
-    parser.register_prod_rule(exp, vector<parser_token>{LPAR, exp, RPAR});
+    parser.register_prod_rule(exp, vector<parser_token>{LPAR, exp, RPAR}, "parexp");
 
     parser.register_prod_rule(exp, vector<parser_token>{MINUS, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{PLUS, exp});
+    parser.register_prod_rule(exp, vector<parser_token>{PLUS, exp}, "plusexp");
 
 
     parser.construct_parser(system_goal, vector<parser_token>{program, SCANEOF});

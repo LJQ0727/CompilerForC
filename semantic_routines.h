@@ -5,16 +5,19 @@
 #include <iostream>
 #include <sstream>
 #include <stack>
+#include <map>
 
 #include "parser.h"
 
+map<string, int> symbol_table;  // map from variable name to memory location
+
 // This enum is used to determine the type of a primary struct and guide to the corresponding data field
 enum semantic_type {
-    id_primary,
-    literal_primary,
-    expression_primary,
+    id, // id value is stored in a memory location
+    literal,
+    expression,
 
-    terminal,   // raw info
+    terminal,   // the raw info directly from scanner
 };
 
 class Semantic {
@@ -30,14 +33,16 @@ public:
     // if is expression, then retrieve from the memory location {mem_location}($sp)
     // if is variable, then retrieve value from looking up symbol table
     enum semantic_type type;
-    char variable_name[33];    // only variable has this
+    std::string variable_name;    // only variable has this
     int value;  // only int literal has this
 
     std::string raw_value;
 
     int mem_location;  // used to store expression
 
-    std::vector<std::string> instrucitions;
+    std::vector<std::string> instructions;
+
+    std::vector<std::string> evalute_expression();  // fill in the instructions, evaluation result saved in $t0
 };
 
 void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack);
