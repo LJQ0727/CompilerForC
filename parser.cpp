@@ -683,22 +683,22 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(exp, vector<parser_token>{ID}, "exp_id");
     parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE}, "id_idx");
     parser.register_prod_rule(exp, vector<parser_token>{NOT_OP, exp}, "not_exp");
-    parser.register_prod_rule(exp, vector<parser_token>{exp, PLUS, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, MINUS, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, MUL_OP, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, DIV_OP, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, SHL_OP, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, SHR_OP, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, AND_OP, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, OR_OP, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, ANDAND, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, OROR, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, EQ, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, NOTEQ, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, LT, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, GT, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, LTEQ, exp});
-    parser.register_prod_rule(exp, vector<parser_token>{exp, GTEQ, exp});
+    parser.register_prod_rule(exp, vector<parser_token>{exp, PLUS, exp}, "plus");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, MINUS, exp}, "minus");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, MUL_OP, exp}, "mul");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, DIV_OP, exp}, "div");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, SHL_OP, exp}, "shl");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, SHR_OP, exp}, "shr");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, AND_OP, exp}, "and");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, OR_OP, exp}, "or");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, ANDAND, exp}, "andand");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, OROR, exp}, "oror");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, EQ, exp}, "eq");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, NOTEQ, exp}, "noteq");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, LT, exp}, "lt");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, GT, exp}, "gt");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, LTEQ, exp}, "lteq");
+    parser.register_prod_rule(exp, vector<parser_token>{exp, GTEQ, exp}, "gteq");
 
     parser.register_prod_rule(exp, vector<parser_token>{LPAR, exp, RPAR}, "parexp");
 

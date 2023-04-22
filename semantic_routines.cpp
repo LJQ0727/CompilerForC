@@ -10,7 +10,23 @@ int next_mem_location = -4; // start from -4, because $sp is pointing to the top
 
 // }
 
-
+static void get_semantic_value(Semantic semantic, int reg_no, Semantic *new_semantic) {
+    // store the value of semantics in $t{reg_no}
+    switch (semantic.type)
+    {
+    case literal:
+        new_semantic->instructions.push_back("li $t" + to_string(reg_no) + ", " + to_string(semantic.value));
+        break;
+    case expression:
+        new_semantic->instructions.push_back("lw $t" + to_string(reg_no) + ", " + to_string(semantic.mem_location) + "($sp)");
+        break;
+    case id:
+        new_semantic->instructions.push_back("lw $t" + to_string(reg_no) + ", " + to_string(symbol_table[semantic.variable_name]) + "($sp)");
+        break;
+    default:
+        break;
+    }
+}
 
 void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     // generate mips code upon reduction
@@ -89,9 +105,86 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             break;
         }
     }
+    else if (rule.descriptor == "plus") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.instructions.push_back("add $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.instructions.push_back("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "minus") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.instructions.push_back("sub $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.instructions.push_back("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "mul") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.instructions.push_back("mul $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.instructions.push_back("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "div") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.instructions.push_back("div $t1, $t2");
+        new_semantic.instructions.push_back("mflo $t0");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.instructions.push_back("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "shl") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.instructions.push_back("sllv $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.instructions.push_back("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "shr") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.instructions.push_back("srlv $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.instructions.push_back("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+
+
 
 
     
+    else if (rule.descriptor == "exp_id") {
+        new_semantic.type = id;
+        new_semantic.variable_name = semantic_values[0].raw_value;
+    }
+    else if (rule.descriptor == "exp_id") {
+        new_semantic.type = id;
+        new_semantic.variable_name = semantic_values[0].raw_value;
+    }
+    else if (rule.descriptor == "exp_id") {
+        new_semantic.type = id;
+        new_semantic.variable_name = semantic_values[0].raw_value;
+    }
+    else if (rule.descriptor == "exp_id") {
+        new_semantic.type = id;
+        new_semantic.variable_name = semantic_values[0].raw_value;
+    }
+    else if (rule.descriptor == "exp_id") {
+        new_semantic.type = id;
+        new_semantic.variable_name = semantic_values[0].raw_value;
+    }
     else if (rule.descriptor == "exp_id") {
         new_semantic.type = id;
         new_semantic.variable_name = semantic_values[0].raw_value;
