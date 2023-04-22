@@ -66,6 +66,13 @@ public:
 
     std::vector<std::string> instructions;
 
+    void push_back_instruction(std::string instruction) {
+        instructions.push_back(std::string("\t") + instruction);
+    }
+
+    // return the label number
+    int push_back_label();
+
     // std::vector<std::string> evaluate_expression();  // evaluation result saved in $t0
 };
 
