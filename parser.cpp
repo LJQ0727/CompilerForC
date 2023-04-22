@@ -263,7 +263,9 @@ void LROneParser::parse(TokenStream* input_stream) {
                 operator_stack.push(next_token);
             }
             // add shifted semantic value to stack
-            semantic_stack.push(Semantic(next_semantic_value));
+            if (!can_reduce) {
+                semantic_stack.push(Semantic(next_semantic_value));
+            }
             // shift
             // cout << "shift to state " << parser_states[curr_state]->goto_table[next_token] << endl;
             state_stack.push(parser_states[curr_state]->goto_table[next_token]);
@@ -626,10 +628,10 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(program, vector<parser_token>{statements}, "program2");
     
     parser.register_prod_rule(var_declarations, vector<parser_token>{var_declaration});
-    parser.register_prod_rule(var_declarations, vector<parser_token>{var_declarations, var_declaration});
-    parser.register_prod_rule(var_declaration, vector<parser_token>{INT, declaration_list, SEMI});
+    parser.register_prod_rule(var_declarations, vector<parser_token>{var_declarations, var_declaration}); // do nothing
+    parser.register_prod_rule(var_declaration, vector<parser_token>{INT, declaration_list, SEMI}, "var_decl");
     parser.register_prod_rule(declaration_list, vector<parser_token>{declaration});
-    parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration});
+    parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration}); // do nothing
 
     parser.register_prod_rule(declaration, vector<parser_token>{ID}, "id_decl");
     parser.register_prod_rule(declaration, vector<parser_token>{ID, ASSIGN, INT_NUM}, "id_assign");
@@ -644,7 +646,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(statement, vector<parser_token>{assign_statement, SEMI}, "assign_statement");
     parser.register_prod_rule(statement, vector<parser_token>{control_statement}); // auto-copy
     parser.register_prod_rule(statement, vector<parser_token>{read_write_statement, SEMI}, "read_write_statement");
-    parser.register_prod_rule(statement, vector<parser_token>{SEMI});
+    parser.register_prod_rule(statement, vector<parser_token>{SEMI}); // auto-copy
 
     parser.register_prod_rule(control_statement, vector<parser_token>{if_statement}); // auto-copy
     parser.register_prod_rule(control_statement, vector<parser_token>{while_statement}); // auto-copy

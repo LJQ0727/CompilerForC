@@ -596,7 +596,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             new_semantic.merge_with(semantic_values[1]);
         }
         else {
-            assert(false);
+            // do nothing
         }
     }
     
