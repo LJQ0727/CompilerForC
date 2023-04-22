@@ -66,7 +66,7 @@ public:
 
     std::vector<std::string> instructions;
 
-    std::vector<std::string> evaluate_expression();  // evaluation result saved in $t0
+    // std::vector<std::string> evaluate_expression();  // evaluation result saved in $t0
 };
 
 void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack);

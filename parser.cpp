@@ -682,7 +682,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(exp, vector<parser_token>{INT_NUM}, "exp_int");
     parser.register_prod_rule(exp, vector<parser_token>{ID}, "exp_id");
     parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE}, "id_idx");
-    parser.register_prod_rule(exp, vector<parser_token>{NOT_OP, exp});
+    parser.register_prod_rule(exp, vector<parser_token>{NOT_OP, exp}, "not_exp");
     parser.register_prod_rule(exp, vector<parser_token>{exp, PLUS, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, MINUS, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, MUL_OP, exp});
