@@ -660,8 +660,8 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt});
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt, ELSE, code_block});
 
-    parser.register_prod_rule(SCOPE_BEGIN, vector<parser_token>{LPAR});
-    parser.register_prod_rule(SCOPE_END, vector<parser_token>{RPAR});
+    parser.register_prod_rule(SCOPE_BEGIN, vector<parser_token>{LPAR}, "scope_begin");
+    parser.register_prod_rule(SCOPE_END, vector<parser_token>{RPAR}, "scope_end");
 
     parser.register_prod_rule(if_stmt, vector<parser_token>{IF, SCOPE_BEGIN, exp, SCOPE_END, code_block});
     parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, SCOPE_BEGIN, exp, SCOPE_END, code_block});

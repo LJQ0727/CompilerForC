@@ -319,7 +319,12 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             break;
         }
     }
-
+    else if (rule.descriptor == "scope_begin") {
+        symbol_table.add_scope();
+    }
+    else if (rule.descriptor == "scope_end") {
+        symbol_table.close_scope();
+    }
 
 
     
