@@ -233,6 +233,92 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         next_mem_location -= 4;
         new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
     }
+    else if (rule.descriptor == "eq") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.push_back_instruction("sub $t0, $t1, $t2");
+        new_semantic.push_back_instruction("sltiu $t0, $t0, 1");    // whether t0 is 0
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "noteq") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.push_back_instruction("sub $t0, $t1, $t2");
+        new_semantic.push_back_instruction("sltiu $t0, $t0, 1");    // whether t0 is 0
+        // flip bit
+        new_semantic.push_back_instruction("xori $t0, $t0, 1");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "lt") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.push_back_instruction("slt $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "gt") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.push_back_instruction("slt $t0, $t2, $t1");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "lteq") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.push_back_instruction("addi $t2, $t2, 1");
+        new_semantic.push_back_instruction("slt $t0, $t1, $t2");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "gteq") {
+        new_semantic.type = expression;
+        get_semantic_value(semantic_values[0], 1, &new_semantic);
+        get_semantic_value(semantic_values[2], 2, &new_semantic);
+        new_semantic.push_back_instruction("addi $t1, $t1, 1");
+        new_semantic.push_back_instruction("slt $t0, $t2, $t1");
+        new_semantic.mem_location = next_mem_location;
+        next_mem_location -= 4;
+        new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+    }
+    else if (rule.descriptor == "minusexp") {
+        new_semantic = semantic_values[1];
+        switch (new_semantic.type)
+        {
+        case literal:
+            new_semantic.value = -new_semantic.value;
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            new_semantic.push_back_instruction("sub $t0, $zero, $t0");
+            new_semantic.mem_location = next_mem_location;
+            next_mem_location -= 4;
+            new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.type = expression;
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[new_semantic.variable_name]) + "($sp)");
+            new_semantic.push_back_instruction("sub $t0, $zero, $t0");
+            new_semantic.mem_location = next_mem_location;
+            next_mem_location -= 4;
+            new_semantic.push_back_instruction("sw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        default:
+            break;
+        }
+    }
 
 
 

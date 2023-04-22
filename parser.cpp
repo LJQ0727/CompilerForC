@@ -702,7 +702,7 @@ int main(int argc, char const *argv[])
 
     parser.register_prod_rule(exp, vector<parser_token>{LPAR, exp, RPAR}, "parexp");
 
-    parser.register_prod_rule(exp, vector<parser_token>{MINUS, exp});
+    parser.register_prod_rule(exp, vector<parser_token>{MINUS, exp}, "minusexp");
     parser.register_prod_rule(exp, vector<parser_token>{PLUS, exp}, "plusexp");
 
 
