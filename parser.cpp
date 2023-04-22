@@ -92,7 +92,7 @@ public:
     map<parser_token, bool> derives_lambda;  // whether a nonterminal derives lambda
 
     // add a production rule
-    void register_prod_rule(parser_token lhs, vector<parser_token> rhs);
+    void register_prod_rule(parser_token lhs, vector<parser_token> rhs, string descriptor = "");
 
     // returns the added or queryed state number
     pair<int, bool> add_or_query_state(set<ProductionRule> target);
@@ -146,7 +146,7 @@ void LROneParser::parse(TokenStream* input_stream) {
     curr_state = 0;
     stack<int> state_stack;
     stack<parser_token> operator_stack;
-    stack<string> semantic_stack;
+    stack<Semantic> semantic_stack;
     state_stack.push(0);
     parser_token next_token;
     string next_semantic_value;
@@ -263,7 +263,7 @@ void LROneParser::parse(TokenStream* input_stream) {
                 operator_stack.push(next_token);
             }
             // add shifted semantic value to stack
-            semantic_stack.push(next_semantic_value);
+            semantic_stack.push(Semantic(next_semantic_value));
             // shift
             // cout << "shift to state " << parser_states[curr_state]->goto_table[next_token] << endl;
             state_stack.push(parser_states[curr_state]->goto_table[next_token]);
@@ -282,12 +282,13 @@ void LROneParser::parse(TokenStream* input_stream) {
     }
 }
 
-void LROneParser::register_prod_rule(parser_token lhs, vector<parser_token> rhs) {
+void LROneParser::register_prod_rule(parser_token lhs, vector<parser_token> rhs, string descriptor) {
     ProductionRule new_rule;
     new_rule.lhs = lhs;
     new_rule.rhs = rhs;
     new_rule.dot_location = 0;
     new_rule.index = prod_rules.size();
+    new_rule.descriptor = descriptor;
     // new_rule.parser = this;
     // new_rule.lookaheads = NOTHING;
     prod_rules.insert(new_rule);
@@ -678,8 +679,8 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, LPAR, exp, RPAR});
 
 
-    parser.register_prod_rule(exp, vector<parser_token>{INT_NUM});
-    parser.register_prod_rule(exp, vector<parser_token>{ID});
+    parser.register_prod_rule(exp, vector<parser_token>{INT_NUM}, "exp_int");
+    parser.register_prod_rule(exp, vector<parser_token>{ID}, "exp_id");
     parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE});
     parser.register_prod_rule(exp, vector<parser_token>{NOT_OP, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, PLUS, exp});
