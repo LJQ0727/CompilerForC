@@ -664,8 +664,8 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(SCOPE_END, vector<parser_token>{RBRACE}, "scope_end");
 
     parser.register_prod_rule(if_stmt, vector<parser_token>{IF, LPAR, exp, RPAR, code_block}, "if");
-    parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, LPAR, exp, RPAR, code_block});
-    parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, LPAR, exp, RPAR});
+    parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, LPAR, exp, RPAR, code_block}, "while");
+    parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, LPAR, exp, RPAR}, "do_while");
     parser.register_prod_rule(return_statement, vector<parser_token>{RETURN}, "return");
     parser.register_prod_rule(read_statement, vector<parser_token>{READ, LPAR, ID, RPAR}, "read");
     parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, LPAR, exp, RPAR}, "write");

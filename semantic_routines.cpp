@@ -511,8 +511,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         default:
             break;
         }
-        new_semantic.push_back_instruction("beq $t0, $zero, " + get_next_label());
-        new_semantic.push_back_instruction("b " + get_nextnext_label());
+        new_semantic.push_back_instruction("beq $t0, $zero, " + get_nextnext_label());
+        new_semantic.push_back_instruction("b " + get_next_label());
 
         new_semantic.push_back_label();
         new_semantic.merge_with(semantic_values[4]);
@@ -523,6 +523,55 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic = semantic_values[0];
         new_semantic.instructions.insert(new_semantic.instructions.end()-1, "b " + get_next_label());
         new_semantic.merge_with(semantic_values[2]);
+        new_semantic.push_back_label();
+    }
+    else if (rule.descriptor == "while") {
+        string start_label = get_next_label();
+        new_semantic.push_back_label();
+        new_semantic.merge_with(semantic_values[2]);
+
+        // load the exp value into $t0
+        switch (semantic_values[2].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+        new_semantic.push_back_instruction("beq $t0, $zero, " + get_next_label());  // if false, jump to the end of the loop
+        new_semantic.merge_with(semantic_values[4]);
+        new_semantic.push_back_instruction("b " + start_label);
+        new_semantic.push_back_label();
+    }
+    else if (rule.descriptor == "do_while") {
+        string start_label = get_next_label();
+        new_semantic.push_back_label();
+        new_semantic.merge_with(semantic_values[1]);
+
+        // load the exp value into $t0
+        switch (semantic_values[2].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+        new_semantic.push_back_instruction("beq $t0, $zero, " + get_next_label());  // if false, jump to the end of the loop
+        new_semantic.push_back_instruction("b " + start_label);
         new_semantic.push_back_label();
     }
 
