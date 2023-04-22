@@ -8,9 +8,6 @@ int next_mem_location = -4; // start from -4, because $sp is pointing to the top
 
 int label_no = 1;
 
-// std::vector<std::string> Semantic::evaluate_expression() {
-
-// }
 
 static void get_semantic_value(Semantic semantic, int reg_no, Semantic *new_semantic) {
     // store the value of semantics in $t{reg_no}
@@ -61,6 +58,19 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         next_mem_location -= 4;
         new_semantic.type = id;
         new_semantic.variable_name = semantic_values[0].raw_value;
+        // store 0 in the memory location
+        new_semantic.push_back_instruction("li $t0, 0");
+        new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
+    }
+    if (rule.descriptor == "id_assign") {
+        // create a new symbol table entry
+        symbol_table.add_symbol(semantic_values[0].raw_value, next_mem_location);
+        next_mem_location -= 4;
+        new_semantic.type = id;
+        new_semantic.variable_name = semantic_values[0].raw_value;
+        // store the int in the memory location
+        new_semantic.push_back_instruction("li $t0, " + semantic_values[2].raw_value);
+        new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
     }
     else if (rule.descriptor == "id_decl_array") {
         // create symbol table entries for the array
@@ -382,7 +392,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.type = stmt;
         new_semantic.push_back_instruction("b end");
     }
-    else if (rule.descriptor == "program1" || rule.descriptor == "program2") {
+    else if (rule.descriptor == "program1") {
+        new_semantic = semantic_values[0];
         new_semantic.type = stmt;
         // insert main label at the front
         new_semantic.instructions.insert(new_semantic.instructions.begin(), "main:");
@@ -393,8 +404,117 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             cout << instruction << endl;
         }
     }
+    else if (rule.descriptor == "program2") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[1]);
+        new_semantic.type = stmt;
+        // insert main label at the front
+        new_semantic.instructions.insert(new_semantic.instructions.begin(), "main:");
+        new_semantic.instructions.push_back("end:");
+        new_semantic.push_back_instruction("addi $v0, $zero, 1");   // a placeholder instruction
+        // print out all instructions
+        for (auto instruction : new_semantic.instructions) {
+            cout << instruction << endl;
+        }
+    }
+    else if (rule.descriptor == "code_block") {
+        new_semantic = semantic_values[1];
+    }
+    else if (rule.descriptor == "assign_statement") {
+        new_semantic = semantic_values[0];
+    }
+    else if (rule.descriptor == "read_write_statement") {
+        new_semantic = semantic_values[0];
+    }
+    else if (rule.descriptor == "do_while_statement" || rule.descriptor == "return_statement") {
+        new_semantic = semantic_values[0];
+    }
+    else if (rule.descriptor == "assign2") {
+        // ID, ASSIGN, exp
+        new_semantic = semantic_values[2];
+        new_semantic.type = stmt;
+        switch (semantic_values[2].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
+            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].variable_name]) + "($sp)");
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].variable_name]) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+    }
+    else if (rule.descriptor == "assign1") {
+        // ID, LSQUARE, exp, RSQUARE, ASSIGN, exp
+        new_semantic = semantic_values[5];
+        new_semantic.type = stmt;
+        // prepare the rvalue in $t0
+        switch (semantic_values[5].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+        // calculate the lvalue address in $t1
+        switch (semantic_values[2].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t1, $zero, " + to_string(new_semantic.value));
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t1, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t1, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+        // subtract the base address by the offset*4
+        new_semantic.push_back_instruction("sll $t1, $t1, 2");
+        // $t3 will hold the base address
+        new_semantic.push_back_instruction("sw $t3, " + to_string(symbol_table[semantic_values[0].variable_name + "[0]"]) + "($sp)");
+        new_semantic.push_back_instruction("sub $t1, $t3, $t1");
+        // store the value in $t0 to the address in $t1
+        new_semantic.push_back_instruction("add $t1, $sp, $t1");
+        new_semantic.push_back_instruction("sw $t0, 0($t1)");
+    }
+    
 
 
+
+
+
+
+
+
+    else {
+        if (semantic_values.size() == 1) {
+            new_semantic = semantic_values[0];
+        }
+        else if (semantic_values.size() == 2) {
+            new_semantic = semantic_values[0];
+            new_semantic.merge_with(semantic_values[1]);
+        }
+        else {
+            assert(false);
+        }
+    }
     
 
     

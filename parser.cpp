@@ -628,34 +628,34 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(var_declarations, vector<parser_token>{var_declaration});
     parser.register_prod_rule(var_declarations, vector<parser_token>{var_declarations, var_declaration});
     parser.register_prod_rule(var_declaration, vector<parser_token>{INT, declaration_list, SEMI});
-
     parser.register_prod_rule(declaration_list, vector<parser_token>{declaration});
     parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration});
+
     parser.register_prod_rule(declaration, vector<parser_token>{ID}, "id_decl");
-    parser.register_prod_rule(declaration, vector<parser_token>{ID, ASSIGN, INT_NUM});
+    parser.register_prod_rule(declaration, vector<parser_token>{ID, ASSIGN, INT_NUM}, "id_assign");
     parser.register_prod_rule(declaration, vector<parser_token>{ID, LSQUARE, INT_NUM, RSQUARE}, "id_decl_array");
 
-    parser.register_prod_rule(code_block, vector<parser_token>{statement});
-    parser.register_prod_rule(code_block, vector<parser_token>{SCOPE_BEGIN, statements, SCOPE_END});
+    parser.register_prod_rule(code_block, vector<parser_token>{statement}); // auto-copy
+    parser.register_prod_rule(code_block, vector<parser_token>{SCOPE_BEGIN, statements, SCOPE_END}, "code_block");
 
-    parser.register_prod_rule(statements, vector<parser_token>{statement});
-    parser.register_prod_rule(statements, vector<parser_token>{statements, statement});
+    parser.register_prod_rule(statements, vector<parser_token>{statement}); // auto-copy
+    parser.register_prod_rule(statements, vector<parser_token>{statements, statement}); // auto-copy
 
-    parser.register_prod_rule(statement, vector<parser_token>{assign_statement, SEMI});
-    parser.register_prod_rule(statement, vector<parser_token>{control_statement});
-    parser.register_prod_rule(statement, vector<parser_token>{read_write_statement, SEMI});
+    parser.register_prod_rule(statement, vector<parser_token>{assign_statement, SEMI}, "assign_statement");
+    parser.register_prod_rule(statement, vector<parser_token>{control_statement}); // auto-copy
+    parser.register_prod_rule(statement, vector<parser_token>{read_write_statement, SEMI}, "read_write_statement");
     parser.register_prod_rule(statement, vector<parser_token>{SEMI});
 
-    parser.register_prod_rule(control_statement, vector<parser_token>{if_statement});
-    parser.register_prod_rule(control_statement, vector<parser_token>{while_statement});
-    parser.register_prod_rule(control_statement, vector<parser_token>{do_while_statement, SEMI});
-    parser.register_prod_rule(control_statement, vector<parser_token>{return_statement, SEMI});
+    parser.register_prod_rule(control_statement, vector<parser_token>{if_statement}); // auto-copy
+    parser.register_prod_rule(control_statement, vector<parser_token>{while_statement}); // auto-copy
+    parser.register_prod_rule(control_statement, vector<parser_token>{do_while_statement, SEMI}, "do_while_statement");
+    parser.register_prod_rule(control_statement, vector<parser_token>{return_statement, SEMI}, "return_statement");
 
-    parser.register_prod_rule(read_write_statement, vector<parser_token>{read_statement});
-    parser.register_prod_rule(read_write_statement, vector<parser_token>{write_statement});
+    parser.register_prod_rule(read_write_statement, vector<parser_token>{read_statement}); // auto-copy
+    parser.register_prod_rule(read_write_statement, vector<parser_token>{write_statement}); // auto-copy
 
-    parser.register_prod_rule(assign_statement, vector<parser_token>{ID, LSQUARE, exp, RSQUARE, ASSIGN, exp});
-    parser.register_prod_rule(assign_statement, vector<parser_token>{ID, ASSIGN, exp});
+    parser.register_prod_rule(assign_statement, vector<parser_token>{ID, LSQUARE, exp, RSQUARE, ASSIGN, exp}, "assign1");
+    parser.register_prod_rule(assign_statement, vector<parser_token>{ID, ASSIGN, exp}, "assign2");
 
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt});
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt, ELSE, code_block});
