@@ -394,9 +394,9 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     }
     else if (rule.descriptor == "program1") {
         new_semantic = semantic_values[0];
-        new_semantic.type = stmt;
         // insert main label at the front
         new_semantic.instructions.insert(new_semantic.instructions.begin(), "main:");
+        new_semantic.merge_with(semantic_values[1]);
         new_semantic.instructions.push_back("end:");
         new_semantic.push_back_instruction("addi $v0, $zero, 1");   // a placeholder instruction
         // print out all instructions
@@ -406,8 +406,6 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     }
     else if (rule.descriptor == "program2") {
         new_semantic = semantic_values[0];
-        new_semantic.merge_with(semantic_values[1]);
-        new_semantic.type = stmt;
         // insert main label at the front
         new_semantic.instructions.insert(new_semantic.instructions.begin(), "main:");
         new_semantic.instructions.push_back("end:");
@@ -574,7 +572,13 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("b " + start_label);
         new_semantic.push_back_label();
     }
-
+    else if (rule.descriptor == "decl_list") {
+        new_semantic = semantic_values[0];
+        new_semantic.merge_with(semantic_values[2]);
+    }
+    else if (rule.descriptor == "var_decl") {
+        new_semantic = semantic_values[1];
+    }
 
 
 
@@ -596,7 +600,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             new_semantic.merge_with(semantic_values[1]);
         }
         else {
-            // do nothing
+            assert(false);
         }
     }
     

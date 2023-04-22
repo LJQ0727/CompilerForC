@@ -224,8 +224,6 @@ void LROneParser::parse(TokenStream* input_stream) {
                     reduced_token = rule.lhs;
                     cout << "reduce by grammar " << rule.index+1 << ": " << idx_to_token_copy[rule.lhs] << "->";
                     
-                    codegen(rule, &semantic_stack);
-                    
                     if (rule.rhs.size() == 0) {
                         // cout << "lambda" << endl;
                     } else {
@@ -241,6 +239,9 @@ void LROneParser::parse(TokenStream* input_stream) {
                         // print_token_stack(token_stack, token_stack.size()-1);
                         token_stack.pop_back();
                     }
+
+                    codegen(rule, &semantic_stack);
+
                     for (int i = 0; i < rule.rhs.size(); i++) {
                         state_stack.pop();
                     }
@@ -627,11 +628,11 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(program, vector<parser_token>{var_declarations, statements}, "program1");
     parser.register_prod_rule(program, vector<parser_token>{statements}, "program2");
     
-    parser.register_prod_rule(var_declarations, vector<parser_token>{var_declaration});
-    parser.register_prod_rule(var_declarations, vector<parser_token>{var_declarations, var_declaration}); // do nothing
+    parser.register_prod_rule(var_declarations, vector<parser_token>{var_declaration}); // auto-copy
+    parser.register_prod_rule(var_declarations, vector<parser_token>{var_declarations, var_declaration}); // auto-copy
     parser.register_prod_rule(var_declaration, vector<parser_token>{INT, declaration_list, SEMI}, "var_decl");
-    parser.register_prod_rule(declaration_list, vector<parser_token>{declaration});
-    parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration}); // do nothing
+    parser.register_prod_rule(declaration_list, vector<parser_token>{declaration}); // auto-copy
+    parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration}, "decl_list");
 
     parser.register_prod_rule(declaration, vector<parser_token>{ID}, "id_decl");
     parser.register_prod_rule(declaration, vector<parser_token>{ID, ASSIGN, INT_NUM}, "id_assign");
