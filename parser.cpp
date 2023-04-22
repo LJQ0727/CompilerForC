@@ -632,7 +632,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration});
     parser.register_prod_rule(declaration, vector<parser_token>{ID}, "id_decl");
     parser.register_prod_rule(declaration, vector<parser_token>{ID, ASSIGN, INT_NUM});
-    parser.register_prod_rule(declaration, vector<parser_token>{ID, LSQUARE, INT_NUM, RSQUARE}, "id_decl_init");
+    parser.register_prod_rule(declaration, vector<parser_token>{ID, LSQUARE, INT_NUM, RSQUARE}, "id_decl_array");
 
     parser.register_prod_rule(code_block, vector<parser_token>{statement});
     parser.register_prod_rule(code_block, vector<parser_token>{LBRACE, statements, RBRACE});
@@ -681,7 +681,7 @@ int main(int argc, char const *argv[])
 
     parser.register_prod_rule(exp, vector<parser_token>{INT_NUM}, "exp_int");
     parser.register_prod_rule(exp, vector<parser_token>{ID}, "exp_id");
-    parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE}, "id_init");
+    parser.register_prod_rule(exp, vector<parser_token>{ID, LSQUARE, exp, RSQUARE}, "id_idx");
     parser.register_prod_rule(exp, vector<parser_token>{NOT_OP, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, PLUS, exp});
     parser.register_prod_rule(exp, vector<parser_token>{exp, MINUS, exp});

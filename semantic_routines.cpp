@@ -30,18 +30,14 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.type = id;
         new_semantic.variable_name = semantic_values[0].raw_value;
     }
-    else if (rule.descriptor == "id_decl_init") {
-        // create a new symbol table entry
-        symbol_table.add_symbol(semantic_values[0].raw_value, next_mem_location);
-        next_mem_location -= 4;
+    else if (rule.descriptor == "id_decl_array") {
+        // create symbol table entries for the array
+        for (int i = 0; i < stoi(semantic_values[2].raw_value); i++) {
+            symbol_table.add_symbol(semantic_values[0].raw_value + "[" + to_string(i) + "]", next_mem_location);
+            next_mem_location -= 4;
+        }
         new_semantic.type = id;
         new_semantic.variable_name = semantic_values[0].raw_value;
-        // evaluate the expression
-        vector<string> instructions = semantic_values[2].evaluate_expression();
-        // save the result to the memory location of id
-        int mem_loc = symbol_table[semantic_values[0].raw_value];
-        instructions.push_back("sw $t0, " + to_string(mem_loc) + "($sp)");
-        new_semantic.instructions = instructions;
     }
 
     // dealing with expressions
@@ -59,14 +55,11 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     else if (rule.descriptor == "parexp") {
         new_semantic = semantic_values[1];
     }
-    else if (rule.descriptor == "id_init") {
-        new_semantic.type = id;
-        new_semantic.variable_name = semantic_values[0].raw_value;
-        vector<string> instructions = semantic_values[2].evaluate_expression();
-        // save the result to the memory location of id
-        int mem_loc = symbol_table[new_semantic.variable_name];
-        instructions.push_back("sw $t0, " + to_string(mem_loc) + "($sp)");
-        new_semantic.instructions = instructions;
+    else if (rule.descriptor == "id_idx") {
+        // index the array
+        new_semantic.type = expression;
+        string key = semantic_values[0].raw_value + "[" + semantic_values[2].raw_value + "]";
+        new_semantic.mem_location = symbol_table[key];
     }
 
 
