@@ -9,8 +9,6 @@
 
 #include "parser.h"
 
-map<string, int> symbol_table;  // map from variable name to memory location
-
 // This enum is used to determine the type of a primary struct and guide to the corresponding data field
 enum semantic_type {
     id, // id value is stored in a memory location
@@ -19,7 +17,30 @@ enum semantic_type {
 
     terminal,   // the raw info directly from scanner
 };
-
+class SymbolTable {
+public:
+    SymbolTable() {
+        // initialize the global scope
+        tables.push_back(std::map<std::string, int>());
+    }
+    std::vector<std::map<std::string, int>> tables;
+    int operator[](std::string key) {
+        for (int i = tables.size() - 1; i >= 0; i--) {
+            if (tables[i].find(key) != tables[i].end()) {
+                return tables[i][key];
+            }
+        }
+    }
+    void add_scope() {
+        tables.push_back(std::map<std::string, int>());
+    }
+    void close_scope() {
+        tables.pop_back();
+    }
+    void add_symbol(std::string key, int loc) {
+        tables[tables.size() - 1][key] = loc;
+    }
+};
 class Semantic {
 public:
     Semantic(std::string terminal_value) {
@@ -27,7 +48,10 @@ public:
         raw_value = terminal_value;
     }
     Semantic() {
-
+        type = terminal;
+        raw_value = "";
+        value = 0;
+        mem_location = 0;
     }
     // if is literal, then retrieve value from it
     // if is expression, then retrieve from the memory location {mem_location}($sp)
@@ -42,7 +66,7 @@ public:
 
     std::vector<std::string> instructions;
 
-    std::vector<std::string> evalute_expression();  // fill in the instructions, evaluation result saved in $t0
+    std::vector<std::string> evaluate_expression();  // evaluation result saved in $t0
 };
 
 void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack);

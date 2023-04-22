@@ -181,8 +181,8 @@ void LROneParser::parse(TokenStream* input_stream) {
 
 
     while (true) {
-        next_token = input_stream->get();
         next_semantic_value = input_stream->get_semantic_value();
+        next_token = input_stream->get();
 
         // cout << "state: " << curr_state << "\t" << "next type: " << idx_to_token_copy[next_token] << "\t\t";
 
@@ -630,9 +630,9 @@ int main(int argc, char const *argv[])
 
     parser.register_prod_rule(declaration_list, vector<parser_token>{declaration});
     parser.register_prod_rule(declaration_list, vector<parser_token>{declaration_list, COMMA, declaration});
-    parser.register_prod_rule(declaration, vector<parser_token>{ID});
+    parser.register_prod_rule(declaration, vector<parser_token>{ID}, "id_decl");
     parser.register_prod_rule(declaration, vector<parser_token>{ID, ASSIGN, INT_NUM});
-    parser.register_prod_rule(declaration, vector<parser_token>{ID, LSQUARE, INT_NUM, RSQUARE});
+    parser.register_prod_rule(declaration, vector<parser_token>{ID, LSQUARE, INT_NUM, RSQUARE}, "id_decl_init");
 
     parser.register_prod_rule(code_block, vector<parser_token>{statement});
     parser.register_prod_rule(code_block, vector<parser_token>{LBRACE, statements, RBRACE});
