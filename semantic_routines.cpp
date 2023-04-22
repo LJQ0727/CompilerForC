@@ -368,8 +368,23 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         symbol_table.close_scope();
     }
     else if (rule.descriptor == "write") {
-        // load the value into $a0
         new_semantic = semantic_values[2];
+        // prepare the rvalue in $t0
+        switch (semantic_values[2].type)
+        {
+        case literal:
+            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
+            break;
+        case expression:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
+            break;
+        case id:
+            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
+            break;
+        default:
+            break;
+        }
+        // load the value into $a0
         new_semantic.type = stmt;
         new_semantic.push_back_instruction("add $a0, $zero, $t0");
         // load 1 in $v0 and print the integer
@@ -384,7 +399,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         // load 5 in $v0
         new_semantic.push_back_instruction("addi $v0, $zero, 5");
         new_semantic.push_back_instruction("syscall");
-        // store the result in $v0 in the variable
+        // store the result in $v0 to the variable
         new_semantic.type = stmt;
         new_semantic.push_back_instruction("sw $v0, " + to_string(symbol_table[semantic_values[2].raw_value]) + "($sp)");
     }
