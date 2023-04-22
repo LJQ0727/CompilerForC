@@ -30,6 +30,7 @@ public:
                 return tables[i][key];
             }
         }
+        return 0;
     }
     void add_scope() {
         tables.push_back(std::map<std::string, int>());

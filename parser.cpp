@@ -593,6 +593,7 @@ int main(int argc, char const *argv[])
         "if_statement", "if_stmt", 
         "exp", "LAMBDA", "SCANEOF",
         "primary", "system_goal",
+        "SCOPE_BEGIN", "SCOPE_END",
     };
     for (string token : nonterminal_tokens) {
         idx_to_token_copy.push_back(token);
@@ -659,24 +660,15 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt});
     parser.register_prod_rule(if_statement, vector<parser_token>{if_stmt, ELSE, code_block});
 
-    // if stmt : IF LPAR exp RPAR code block
-    // 14. while statement : WHILE LPAR exp RPAR code block
-    // 15. do while statement: DO code block WHILE LPAR exp RPAR
-    // 16. return statement : RETURN
-    // 17. read statement: READ LPAR IDENTIFIER RPAR
-    // 18. write statement : WRITE LPAR exp RPAR
-    // 19. exp: INT NUM | IDENTIFIER | IDENTIFIER LSQUARE exp LSQUARE | NOT OP exp | exp AND OP exp |
-    // exp OR OP exp | exp PLUS exp | exp MINUS exp | exp MUL OP exp | exp DIV OP exp |
-    // exp LT exp | exp GT exp | exp EQ exp | exp NOTEQ exp | exp LTEQ exp | exp GTEQ exp |
-    // exp SHL OP exp | exp SHR OP exp | exp ANDAND exp | exp OROR exp | LPAR exp RPAR |
-    // MINUS exp
+    parser.register_prod_rule(SCOPE_BEGIN, vector<parser_token>{LPAR});
+    parser.register_prod_rule(SCOPE_END, vector<parser_token>{RPAR});
 
-    parser.register_prod_rule(if_stmt, vector<parser_token>{IF, LPAR, exp, RPAR, code_block});
-    parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, LPAR, exp, RPAR, code_block});
-    parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, LPAR, exp, RPAR});
+    parser.register_prod_rule(if_stmt, vector<parser_token>{IF, SCOPE_BEGIN, exp, SCOPE_END, code_block});
+    parser.register_prod_rule(while_statement, vector<parser_token>{WHILE, SCOPE_BEGIN, exp, SCOPE_END, code_block});
+    parser.register_prod_rule(do_while_statement, vector<parser_token>{DO, code_block, WHILE, SCOPE_BEGIN, exp, SCOPE_END});
     parser.register_prod_rule(return_statement, vector<parser_token>{RETURN});
-    parser.register_prod_rule(read_statement, vector<parser_token>{READ, LPAR, ID, RPAR});
-    parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, LPAR, exp, RPAR});
+    parser.register_prod_rule(read_statement, vector<parser_token>{READ, SCOPE_BEGIN, ID, SCOPE_END});
+    parser.register_prod_rule(write_statement, vector<parser_token>{WRITE, SCOPE_BEGIN, exp, SCOPE_END});
 
 
     parser.register_prod_rule(exp, vector<parser_token>{INT_NUM}, "exp_int");
@@ -700,7 +692,7 @@ int main(int argc, char const *argv[])
     parser.register_prod_rule(exp, vector<parser_token>{exp, LTEQ, exp}, "lteq");
     parser.register_prod_rule(exp, vector<parser_token>{exp, GTEQ, exp}, "gteq");
 
-    parser.register_prod_rule(exp, vector<parser_token>{LPAR, exp, RPAR}, "parexp");
+    parser.register_prod_rule(exp, vector<parser_token>{SCOPE_BEGIN, exp, SCOPE_END}, "parexp");
 
     parser.register_prod_rule(exp, vector<parser_token>{MINUS, exp}, "minusexp");
     parser.register_prod_rule(exp, vector<parser_token>{PLUS, exp}, "plusexp");

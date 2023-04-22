@@ -59,6 +59,9 @@ enum parser_token {
 
     primary,
     system_goal,
+
+    SCOPE_BEGIN,
+    SCOPE_END,
 };
 
 inline bool is_terminal_token(parser_token tok) {
