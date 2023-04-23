@@ -486,6 +486,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_label();
     }
     else if (rule.descriptor == "while") {
+        // WHILE, LPAR, exp, RPAR, code_block
         string start_label = get_next_label();
         new_semantic.push_back_label();
         new_semantic.merge_with(semantic_values[2]);
@@ -498,12 +499,14 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_label();
     }
     else if (rule.descriptor == "do_while") {
+        // DO, code_block, WHILE, LPAR, exp, RPAR
         string start_label = get_next_label();
         new_semantic.push_back_label();
         new_semantic.merge_with(semantic_values[1]);
+        new_semantic.merge_with(semantic_values[4]);
 
         // load the exp value into $t0
-        get_semantic_value(semantic_values[2], 0, &new_semantic);
+        get_semantic_value(semantic_values[4], 0, &new_semantic);
         
         new_semantic.push_back_instruction("beq $t0, $zero, " + get_next_label());  // if false, jump to the end of the loop
         new_semantic.push_back_instruction("b " + start_label);
