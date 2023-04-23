@@ -100,8 +100,9 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
 
     // for every expression type, we need to store the result in a memory location
     else if (rule.descriptor == "id_idx") {
-        new_semantic = semantic_values[2];
+        // ID, LSQUARE, exp, RSQUARE
         // index the array
+        new_semantic = semantic_values[2];
         new_semantic.type = expression;
         // load the exp value into $t0
         switch (semantic_values[2].type)
@@ -124,7 +125,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.push_back_instruction("addi $t3, $sp, " + to_string(symbol_table[semantic_values[0].raw_value + "[0]"]));
         new_semantic.push_back_instruction("sub $t0, $t3, $t0");
         // $t0 now holds the memory offset
-        new_semantic.push_back_instruction("sw $t1, 0($t0)");
+        new_semantic.push_back_instruction("lw $t1, 0($t0)");
         // $t1 now holds the value of the array element
         new_semantic.mem_location = next_mem_location;
         next_mem_location -= 4;
