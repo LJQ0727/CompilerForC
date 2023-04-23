@@ -9,8 +9,8 @@ int next_mem_location = -4; // start from -4, because $sp is pointing to the top
 int label_no = 1;
 
 
+// store the value of semantics in $t{reg_no}
 static void get_semantic_value(Semantic semantic, int reg_no, Semantic *new_semantic) {
-    // store the value of semantics in $t{reg_no}
     switch (semantic.type)
     {
     case literal:
@@ -105,20 +105,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic = semantic_values[2];
         new_semantic.type = expression;
         // load the exp value into $t0
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 0, &new_semantic);
+        
         // subtract the base address by the offset*4
         new_semantic.push_back_instruction("sll $t0, $t0, 2");  // $t0 will hold the offset
         // $t3 will hold the base address
@@ -396,20 +384,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     else if (rule.descriptor == "write") {
         new_semantic = semantic_values[2];
         // prepare the rvalue in $t0
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 0, &new_semantic);
+        
         // load the value into $a0
         new_semantic.type = stmt;
         new_semantic.push_back_instruction("add $a0, $zero, $t0");
@@ -472,58 +448,17 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         // ID, ASSIGN, exp
         new_semantic = semantic_values[2];
         new_semantic.type = stmt;
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].raw_value]) + "($sp)");
-            new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 0, &new_semantic);
+        new_semantic.push_back_instruction("sw $t0, " + to_string(symbol_table[semantic_values[0].raw_value]) + "($sp)");
     }
     else if (rule.descriptor == "assign1") {
         // ID, LSQUARE, exp, RSQUARE, ASSIGN, exp
         new_semantic = semantic_values[5];
         new_semantic.type = stmt;
         // prepare the rvalue in $t0
-        switch (semantic_values[5].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[5].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[5], 0, &new_semantic);
         // calculate the lvalue address in $t1
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t1, $zero, " + to_string(semantic_values[2].value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t1, " + to_string(semantic_values[2].mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t1, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 1, &new_semantic);
         // subtract the base address by the offset*4
         new_semantic.push_back_instruction("sll $t1, $t1, 2");
         // $t3 will hold the base address
@@ -535,20 +470,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     else if (rule.descriptor == "if") {
         new_semantic = semantic_values[2];
         // load the exp value into $t0
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 0, &new_semantic);
         new_semantic.push_back_instruction("beq $t0, $zero, " + get_nextnext_label());
         new_semantic.push_back_instruction("b " + get_next_label());
 
@@ -569,20 +491,7 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.merge_with(semantic_values[2]);
 
         // load the exp value into $t0
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 0, &new_semantic);
         new_semantic.push_back_instruction("beq $t0, $zero, " + get_next_label());  // if false, jump to the end of the loop
         new_semantic.merge_with(semantic_values[4]);
         new_semantic.push_back_instruction("b " + start_label);
@@ -594,20 +503,8 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
         new_semantic.merge_with(semantic_values[1]);
 
         // load the exp value into $t0
-        switch (semantic_values[2].type)
-        {
-        case literal:
-            new_semantic.push_back_instruction("addi $t0, $zero, " + to_string(new_semantic.value));
-            break;
-        case expression:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(new_semantic.mem_location) + "($sp)");
-            break;
-        case id:
-            new_semantic.push_back_instruction("lw $t0, " + to_string(symbol_table[semantic_values[2].variable_name]) + "($sp)");
-            break;
-        default:
-            break;
-        }
+        get_semantic_value(semantic_values[2], 0, &new_semantic);
+        
         new_semantic.push_back_instruction("beq $t0, $zero, " + get_next_label());  // if false, jump to the end of the loop
         new_semantic.push_back_instruction("b " + start_label);
         new_semantic.push_back_label();
