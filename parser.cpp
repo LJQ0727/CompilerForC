@@ -222,19 +222,19 @@ void LROneParser::parse(TokenStream* input_stream) {
                 if (rule.is_end() && rule.lookaheads.count(next_token)) {
                     // perform reduce
                     reduced_token = rule.lhs;
-                    cout << "reduce by grammar " << rule.index+1 << ": " << idx_to_token_copy[rule.lhs] << "->";
+                    // cout << "reduce by grammar " << rule.index+1 << ": " << idx_to_token_copy[rule.lhs] << "->";
                     
                     if (rule.rhs.size() == 0) {
                         // cout << "lambda" << endl;
                     } else {
                         for (auto tok : rule.rhs) {
-                            cout << idx_to_token_copy[tok] << " ";
+                            // cout << idx_to_token_copy[tok] << " ";
                             if (is_operator(tok)) {
                                 operator_stack.pop();
                             }
                             token_stack.pop_back();
                         }
-                        cout << endl;
+                        // cout << endl;
                         token_stack.push_back(reduced_token);
                         // print_token_stack(token_stack, token_stack.size()-1);
                         token_stack.pop_back();
