@@ -1,3 +1,15 @@
+/*
+    File: semantic_routines.cpp
+    Author: Jiaqi Li
+    The semantic routines api for the Simplified C compiler, used by the parser.
+
+    The `semantic_type` is used to determine the type of `Semantic` object and guide to the corresponding data field.
+    The `SymbolTable` is used to store the symbol table for the compiler with scoping information.
+    The `Semantic` is used to store the semantic information for each scanned token.
+
+    `codegen` is the main function for code generation, which is called by the parser whenever a production rule is reduced.
+*/
+
 #pragma once
 
 #include <string>

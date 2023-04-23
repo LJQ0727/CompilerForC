@@ -1,3 +1,10 @@
+/* File: parser.h
+    Author: Jiaqi Li
+    Expose the parser tokens to the semantic routines file.
+    Expose the `ProductionRule` class, which is used to represent the parsing status, 
+    use in the LR(1) parser implementation and the semantic routines.
+*/
+
 #pragma once
 
 #include <stack>

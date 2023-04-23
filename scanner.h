@@ -1,3 +1,10 @@
+/*
+    File: scanner.h
+    Author: Jiaqi Li
+    The scanner api for the C-like language compiler
+
+*/
+
 #pragma once
 
 #include <vector>
