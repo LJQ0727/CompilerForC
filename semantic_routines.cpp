@@ -1,3 +1,12 @@
+/*
+    File: semantic_routines.cpp
+    Author: Jiaqi Li
+    The semantic routines part for the Simplified C compiler
+
+    The semantic routines are used to generate the MIPS code for the input code.
+    The semantic routines are called upon reduction of a production rule.
+*/
+
 #include "semantic_routines.h"
 
 using namespace std;
@@ -521,16 +530,6 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
     }
 
 
-
-
-
-
-
-
-
-
-
-
     else {
         if (semantic_values.size() == 1) {
             new_semantic = semantic_values[0];
@@ -543,8 +542,6 @@ void codegen(ProductionRule rule, std::stack<Semantic> *semantic_stack) {
             assert(false);
         }
     }
-    
-
     
     semantic_stack->push(new_semantic);
 }
