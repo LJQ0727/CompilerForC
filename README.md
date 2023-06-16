@@ -1,4 +1,4 @@
-# A C-Like Compiler
+# A C-Like Compiler for MIPS Instruction Set
 
 Jiaqi Li
 
